@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Silent Auction Heist — 30 Round RPG</title>
+<style>
+:root{
+ --bg:#080b14;--panel:#121827;--panel2:#192238;--line:#303b58;--text:#f7f8ff;--muted:#aab4cb;
+ --accent:#b794ff;--gold:#f0ca67;--good:#59d486;--bad:#ff667d;--cyan:#69d7ff;
+ --skin:#d9a47d;--skin2:#b97958;--ink:#1d1720;--stage:#252b42;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:radial-gradient(circle at 50% -10%,#2a3157 0,#0b0f1c 38%,#060810 100%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100%}
+button,input,select{font:inherit}
+button{border:0;border-radius:12px;padding:11px 15px;background:var(--accent);color:#100d18;font-weight:900;cursor:pointer;min-height:44px}
+button.secondary{background:#2b3652;color:var(--text)}button.good{background:var(--good)}button.danger{background:#6d2637;color:#fff}
+button:disabled{opacity:.42;cursor:not-allowed}
+.wrap{max-width:1180px;margin:auto;padding:18px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.brand{font-size:25px;font-weight:1000;letter-spacing:-.5px}.subbrand{font-size:12px;color:var(--muted)}
+.topright{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.pill{display:inline-flex;align-items:center;gap:5px;padding:7px 10px;border-radius:99px;background:#202a43;border:1px solid #35415e;font-size:12px;font-weight:800}
+.screen{display:none}.screen.active{display:block}.panel{background:rgba(18,24,39,.96);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 20px 70px #0007}
+h1,h2,h3{margin:0 0 8px}p{line-height:1.5}.muted{color:var(--muted)}.center{text-align:center}
+.grid{display:grid;gap:14px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}input,select{width:100%;background:#0b1120;border:1px solid #3a4764;color:var(--text);border-radius:11px;padding:12px;outline:none}input:focus,select:focus{border-color:var(--accent)}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:15px}.right{justify-content:flex-end}.space{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.code{display:inline-block;font-size:32px;font-weight:1000;letter-spacing:7px;padding:13px 18px;background:#0b1020;border-radius:14px}
+.players{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:15px}.playercard{background:#202941;border:1px solid #36425f;border-radius:15px;padding:13px}.avatar-mini{font-size:35px}
+.notice{padding:12px 14px;border-radius:12px;background:#202a43;border:1px solid #33405e;margin-top:10px}.notice.good{background:#153422;border-color:#27633d}.notice.bad{background:#401b29;border-color:#713447}.notice.gold{background:#3d3017;border-color:#705a25}
+.progress{height:9px;background:#080d18;border-radius:99px;overflow:hidden;border:1px solid #28334e}.progress>span{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--cyan));width:3.33%;transition:width .3s}
+.art-card{border:1px solid #46516d;border-radius:18px;overflow:hidden;background:#0d1322}.art-image{height:290px;background:#111827;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}.art-image img{width:100%;height:100%;object-fit:cover}.art-fallback{font-size:75px;text-align:center}.art-meta{padding:15px}.art-title{font-size:22px;font-weight:1000}.artist{color:#c9d1e5}.valuation{font-size:28px;color:var(--gold);font-weight:1000;margin-top:5px}
+.secret{background:#0d1322;border:1px dashed #4b5878;padding:15px;border-radius:15px}.big-input{font-size:22px;font-weight:900;text-align:center}
+.auction-room{position:relative;min-height:330px;border-radius:18px;overflow:hidden;background:linear-gradient(#242c46 0 52%,#171c2d 52% 100%);border:1px solid #3b4662}.ceiling{position:absolute;top:0;left:0;right:0;height:20px;background:#39445f}.backdrop{position:absolute;left:8%;right:8%;top:45px;height:120px;background:linear-gradient(135deg,#3d4561,#202840);border:2px solid #535d77;border-radius:8px}.backdrop:after{content:"SILENT AUCTION";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:13px;letter-spacing:4px;color:#cdd3e2}.audience{position:absolute;left:4%;right:4%;bottom:16px;height:140px;display:flex;justify-content:space-around;align-items:end}.seat{width:17%;height:72px;background:#222a40;border-radius:18px 18px 8px 8px;position:relative}.seat:before{content:"";position:absolute;left:20%;right:20%;top:-45px;height:48px;border-radius:50% 50% 42% 42%;background:var(--skin)}.seat:after{content:"";position:absolute;left:11%;right:11%;top:-8px;height:46px;border-radius:18px 18px 7px 7px;background:var(--suit,#352c50)}.seat .paddle{position:absolute;z-index:3;right:-5px;top:-65px;width:30px;height:43px;border-radius:5px;background:#e7c97b;color:#332a13;display:none;font-size:10px;font-weight:1000;text-align:center;padding-top:12px}.seat.active .paddle{display:block;animation:paddle .7s ease-in-out infinite alternate}@keyframes paddle{from{transform:rotate(-8deg) translateY(0)}to{transform:rotate(8deg) translateY(-8px)}}
+.seatname{position:absolute;top:35px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:10px;color:#e5e9f4;z-index:4}
+.budgetline{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.stat{background:#0d1322;border:1px solid #2d3854;padding:8px 10px;border-radius:10px;font-size:12px}.stat b{color:#fff}
+.mini-nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.market-row{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px;background:#0e1423;border:1px solid #303b56;border-radius:14px;margin-top:9px}.thumb{font-size:42px}.offer{font-size:20px;color:var(--gold);font-weight:1000}
+.shopgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:12px;margin-top:14px}.fashion{background:linear-gradient(145deg,#202943,#101625);border:1px solid #3a4764;border-radius:17px;padding:16px;position:relative;overflow:hidden}.fashion:after{content:"";position:absolute;width:100px;height:100px;right:-45px;top:-45px;background:#b794ff20;border-radius:50%}.fashion-icon{font-size:52px}.price{font-size:20px;font-weight:1000;color:var(--gold)}.tag{color:#c8d0e2;font-size:12px}.owned{color:var(--good);font-weight:800;font-size:12px}
+.custom-card{padding:15px;background:#0e1423;border:1px solid #303b56;border-radius:14px}.swatches{display:flex;gap:8px;flex-wrap:wrap}.swatch{width:31px;height:31px;border-radius:50%;border:2px solid #56627d;cursor:pointer}.swatch.selected{outline:3px solid var(--accent)}
+.stage{position:relative;height:500px;border-radius:20px;overflow:hidden;background:radial-gradient(circle at 50% 15%,#737b9d 0,#2a3048 28%,#0c1120 75%);border:1px solid #3e4965}.spot{position:absolute;width:380px;height:380px;left:50%;top:-80px;transform:translateX(-50%);background:radial-gradient(circle,#fff8d799 0,#c8baff25 42%,transparent 70%)}.floor{position:absolute;bottom:20px;left:9%;right:9%;height:65px;border-radius:50%;background:linear-gradient(#454d6a,#171c2d);border-top:2px solid #858da7}.rpgchar{position:absolute;z-index:2;left:-28%;bottom:42px;width:270px;animation:walkstage 2.4s cubic-bezier(.15,.75,.3,1) forwards}@keyframes walkstage{to{left:calc(50% - 135px)}}.figure{width:270px;filter:drop-shadow(0 18px 14px #0009)}.portraitSvg{display:block;width:100%;height:auto}.stage-caption{background:#202a43;border:1px solid #3a4663;border-radius:12px;padding:12px;margin-top:10px}.shopgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.fashion{display:grid;grid-template-columns:105px 1fr;gap:12px;align-items:center;padding:13px;background:#0e1423;border:1px solid #303b56;border-radius:15px}.fashion-preview{width:105px;height:115px;border-radius:13px;background:linear-gradient(145deg,#fff,#ddd2df);display:grid;place-items:center;overflow:hidden}.fashion-preview svg{width:100%;height:100%}.fashion-info h3{margin:0 0 4px}.fashion-info .tag{color:var(--muted);font-size:12px}.fashion-info .price{font-weight:1000;color:var(--gold);margin:5px 0}.fashion-info button{width:100%;margin-top:6px}.studioPreview{border:1px solid #303b56;border-radius:16px;background:radial-gradient(circle at 50% 20%,#fff,#d9ccd9);padding:8px;min-height:420px;display:grid;place-items:center}.studioPreview .portraitSvg{width:100%;max-width:390px}.studioControls{display:grid;gap:10px}.studioControls h4{margin:0}.studioControls .swatches{padding:8px 0}.studioTitle{font-size:18px;font-weight:900;margin-bottom:8px}@media(max-width:760px){.shopgrid{grid-template-columns:1fr}}
+.finaltable{overflow-x:auto}table{width:100%;border-collapse:collapse;margin-top:14px;min-width:700px}th,td{text-align:left;padding:10px;border-bottom:1px solid #2e3954}th{font-size:11px;text-transform:uppercase;color:var(--muted)}.final-score{font-size:20px;color:var(--gold);font-weight:1000}.rule{display:inline-block;padding:11px 14px;border-radius:12px;background:#202a43;border:1px solid #394563;margin-top:8px}
+@media(max-width:760px){.g2,.g3{grid-template-columns:1fr}.wrap{padding:11px}.art-image{height:230px}.market-row{grid-template-columns:1fr}.auction-room{min-height:300px}.seatname{font-size:8px}}
+</style>
+<style>
+.svgPortrait{display:block;width:100%;height:auto}
+.boutiqueVisual{height:155px;border-radius:15px;background:linear-gradient(145deg,#fff,#e8dce8);display:grid;place-items:center;overflow:hidden;border:1px solid #d7c8d7}
+.boutiqueVisual svg{width:100%;height:100%}
+.visualMirror{max-width:470px;margin:auto;padding:8px;border-radius:18px;background:radial-gradient(circle at 50% 20%,#fff,#ded0dd);box-shadow:0 14px 35px rgba(50,30,55,.12)}
+.visualMirror .svgPortrait{width:100%}
+.swatch{position:relative}
+.swatch::after{content:"";position:absolute;left:50%;bottom:-17px;transform:translateX(-50%);font-size:9px;color:#766879;white-space:nowrap}
+</style><style>
+.svgPortrait{display:block;width:100%;height:auto}
+.visualMirror{max-width:470px;margin:auto;padding:8px;border-radius:18px;background:radial-gradient(circle at 50% 20%,#fff,#ded0dd);box-shadow:0 14px 35px rgba(50,30,55,.12)}
+.visualMirror .svgPortrait{width:100%}
+.fashion-preview,.boutiqueVisual{background:linear-gradient(145deg,#fff,#e8dce8)!important;display:grid;place-items:center;overflow:hidden}
+.fashion-preview svg,.boutiqueVisual svg{width:100%;height:100%}
+</style></head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div><div class="brand">🎭 Silent Auction Heist</div><div class="subbrand">30-Round Luxury Art Auction RPG • Local Pass-and-Play</div></div>
+    <div class="topright"><span id="roundPill" class="pill">Round 0 / 30</span><span id="cashPill" class="pill">Cash: —</span><button class="secondary" id="resetBtn" type="button">New Game</button></div>
+  </header>
+
+  <section id="setup" class="screen active">
+    <div class="panel">
+      <h1>Build your auction room</h1>
+      <p class="muted">This file runs locally. There is no server, account, or backend. Players pass one device and privately lock their bids.</p>
+      <div class="grid g2">
+        <div><label>Room code</label><input id="roomCode" maxlength="8" value="HEIST30"></div>
+        <div><label>Players</label><select id="playerCount"><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option></select></div>
+      </div>
+      <div id="playerInputs" class="grid g2" style="margin-top:14px"></div>
+      <div class="actions"><button id="createBtn" type="button">Create Room</button></div>
+    </div>
+  </section>
+
+  <section id="lobby" class="screen">
+    <div class="panel center">
+      <div class="muted">ROOM CODE</div><div id="roomDisplay" class="code"></div>
+      <h2 style="margin-top:16px">Cast</h2><div id="lobbyPlayers" class="players"></div>
+      <div class="notice gold">Each player begins with $10,000. Fashion and makeup spend cash but never increase final Net Worth.</div>
+      <div class="actions" style="justify-content:center"><button id="startBtn" type="button">Begin 30-Round Heist</button></div>
+    </div>
+  </section>
+
+  <section id="auction" class="screen">
+    <div class="grid g2">
+      <div>
+        <div class="panel">
+          <div class="space"><div><h2 id="turnTitle"></h2><div id="roundText" class="muted"></div></div><span id="budgetPill" class="pill"></span></div>
+          <div class="progress" style="margin-top:12px"><span id="progress"></span></div>
+          <div class="auction-room" style="margin-top:13px">
+            <div class="ceiling"></div><div class="backdrop"></div><div id="audience" class="audience"></div>
+          </div>
+          <div class="budgetline" id="stats"></div>
+        </div>
+      </div>
+      <div>
+        <div id="artPanel" class="art-card"></div>
+        <div class="panel" style="margin-top:12px">
+          <h2>🔒 Secret Bid</h2><div class="muted">Only the active player should look at this panel.</div>
+          <div class="secret" style="margin-top:10px"><label>Bid amount</label><input id="bidInput" class="big-input" type="number" min="0" step="1" placeholder="$0"></div>
+          <div id="bidMessage"></div>
+          <div class="actions"><button id="lockBid" type="button">Lock Bid & Pass Device</button></div>
+          <div class="mini-nav"><button class="secondary" id="customizeBtn" type="button">Customize</button><button class="secondary" id="marketBtn" type="button">Resale Market</button><button class="secondary" id="stageBtn" type="button">Stage Look</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="result" class="screen">
+    <div class="panel">
+      <h1 id="resultTitle"></h1><p id="resultSub" class="muted"></p><div id="resultNotice"></div>
+      <div id="roundScores"></div>
+      <div class="actions"><button id="nextBtn" type="button">Continue</button><button class="secondary" id="resultMarket" type="button">Resale Market</button><button class="secondary" id="resultShop" type="button">Boutique</button><button class="secondary" id="resultStage" type="button">Stage Look</button></div>
+    </div>
+  </section>
+
+  <section id="market" class="screen">
+    <div class="panel">
+      <div class="space"><div><h1>🖼️ NPC Art Resale Market</h1><p class="muted">Selling here is a between-round activity. It never consumes one of the 30 auction rounds.</p></div><button class="secondary" id="marketBack" type="button">Back</button></div>
+      <div id="marketIntro" class="notice"></div><div id="marketList"></div>
+      <div class="actions"><button id="marketDone" type="button">Done — Return to Auction</button></div>
+    </div>
+  </section>
+
+  <section id="shop" class="screen">
+    <div class="panel">
+      <div class="space"><div><h1>💎 The Gilded Boutique</h1><p class="muted">Dress to Impress-inspired luxury styling. Purchases persist through all 30 rounds but are excluded from Net Worth.</p></div><button class="secondary" id="shopBack" type="button">Back</button></div>
+      <div id="shopCash" class="notice"></div>
+      <div id="shopList" class="shopgrid"></div>
+      <h2 style="margin-top:22px">Makeup Studio</h2>
+      <div class="grid g2">
+        <div class="studioPreview" id="preview"></div>
+        <div class="studioControls">
+          <div class="custom-card"><h3>Lipstick</h3><div id="lipSwatches" class="swatches"></div></div>
+          <div class="custom-card"><h3>Eye Shadow</h3><div id="eyeSwatches" class="swatches"></div></div>
+          <div class="custom-card"><h3>Blush</h3><div id="blushSwatches" class="swatches"></div></div>
+          <div class="custom-card"><h3>Winged Eyeliner</h3><div id="linerSwatches" class="swatches"></div></div>
+          <div class="custom-card"><h3>Hair Color</h3><select id="hairSelect"><option value="#241b24">Midnight</option><option value="#5b321e">Chestnut</option><option value="#d8a53c">Golden</option><option value="#d8dbe5">Silver</option><option value="#5b3f80">Amethyst</option></select></div>
+        </div>
+      </div>
+      <div class="actions"><button id="shopDone" type="button">Save Look & Return</button></div>
+    </div>
+  </section>
+
+  <section id="stage" class="screen">
+    <div class="panel center">
+      <h1>🌟 Grand RPG Stage</h1><p class="muted">The active player's complete persistent look walks the aisle and presents on stage.</p>
+      <div class="stage"><div class="spot"></div><div id="stageChar" class="rpgchar"></div><div class="floor"></div></div>
+      <div id="stageCaption" class="stage-caption"></div>
+      <div class="actions" style="justify-content:center"><button id="stageBack" type="button">Return</button></div>
+    </div>
+  </section>
+
+  <section id="final" class="screen">
+    <div class="panel center">
+      <div style="font-size:65px">Winner</div><h1 id="winner"></h1><p id="winnerSub" class="muted"></p>
+      <div class="rule"><b>Final Net Worth</b> = Remaining Cash + Unsold Kept Artwork Value</div>
+      <div class="finaltable" id="finalTable"></div>
+      <div class="notice">Wardrobe, makeup, hair, jewelry, and aura effects are intentionally <b>cash sinks</b>. They add <b>$0</b> to final Net Worth.</div>
+      <div class="actions" style="justify-content:center"><button id="againBtn" type="button">Play Again</button></div>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+"use strict";
+
+/* IMPORTANT OFFLINE NOTE:
+   The artwork records below contain public-domain artwork metadata and optional
+   Wikimedia image URLs. To remain 100% offline, the game uses its own SVG museum-card
+   fallback when an image cannot load. No network request is required for gameplay.
+*/
+const ART=[
+ {title:"Mona Lisa",artist:"Leonardo da Vinci",date:"c. 1503–1519",value:9800,icon:"🖼️",color:"#5e684b",url:"https://upload.wikimedia.org/wikipedia/commons/6/6a/Mona_Lisa.jpg"},
+ {title:"The Starry Night",artist:"Vincent van Gogh",date:"1889",value:8600,icon:"🌌",color:"#183c78",url:"https://upload.wikimedia.org/wikipedia/commons/e/ea/The_Starry_Night.jpg"},
+ {title:"Girl with a Pearl Earring",artist:"Johannes Vermeer",date:"c. 1665",value:7600,icon:"👩🏻",color:"#28465d",url:"https://upload.wikimedia.org/wikipedia/commons/d/d7/Meisje_met_de_parel.jpg"},
+ {title:"The Great Wave off Kanagawa",artist:"Katsushika Hokusai",date:"c. 1831",value:6900,icon:"🌊",color:"#17617d",url:"https://upload.wikimedia.org/wikipedia/commons/0/0d/Great_Wave_off_Kanagawa2.jpg"},
+ {title:"Water Lilies",artist:"Claude Monet",date:"c. 1916",value:6400,icon:"🪷",color:"#4f6378",url:"https://upload.wikimedia.org/wikipedia/commons/a/a7/Claude_Monet_-_Water_Lilies_-_1906%2C_Ryerson.jpg"},
+ {title:"The Birth of Venus",artist:"Sandro Botticelli",date:"c. 1485–1486",value:9200,icon:"🐚",color:"#b68c78",url:"https://upload.wikimedia.org/wikipedia/commons/0/0a/Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg"},
+ {title:"American Gothic",artist:"Grant Wood",date:"1930",value:5300,icon:"🏠",color:"#5a4637",url:"https://upload.wikimedia.org/wikipedia/commons/7/74/Grant_DeVolson_Wood_-_American_Gothic_-_Google_Art_Project.jpg"},
+ {title:"The Persistence of Memory",artist:"Salvador Dalí",date:"1931",value:7100,icon:"⏳",color:"#b58d5a",url:"https://upload.wikimedia.org/wikipedia/en/d/dd/The_Persistence_of_Memory.jpg"},
+ {title:"The Scream",artist:"Edvard Munch",date:"1893",value:6700,icon:"😱",color:"#d37a50",url:"https://upload.wikimedia.org/wikipedia/commons/f/f4/The_Scream.jpg"},
+ {title:"A Sunday on La Grande Jatte",artist:"Georges Seurat",date:"1884–1886",value:5800,icon:"🌳",color:"#718044",url:"https://upload.wikimedia.org/wikipedia/commons/4/4e/A_Sunday_on_La_Grande_Jatte%2C_Seurat%2C_1884.jpg"},
+ {title:"Liberty Leading the People",artist:"Eugène Delacroix",date:"1830",value:6100,icon:"🗽",color:"#6b4c43",url:"https://upload.wikimedia.org/wikipedia/commons/6/6f/Eug%C3%A8ne_Delacroix_-_La_Libert%C3%A9_guidant_le_peuple.jpg"},
+ {title:"The Kiss",artist:"Gustav Klimt",date:"1907–1908",value:7900,icon:"💋",color:"#9a792e",url:"https://upload.wikimedia.org/wikipedia/commons/4/40/Gustav_Klimt_016.jpg"}
+];
+const FASHION=[
+ {id:"gown",name:"Midnight Couture Gown",icon:"👗",price:900,cat:"Designer Gown",type:"outfit",color:"#29235d"},
+ {id:"suit",name:"Ivory Atelier Suit",icon:"🤵",price:950,cat:"Sharp Suit",type:"outfit",color:"#eee9dd"},
+ {id:"redgown",name:"Scarlet Runway Gown",icon:"👗",price:1200,cat:"Designer Gown",type:"outfit",color:"#7d1d39"},
+ {id:"tux",name:"Obsidian Tuxedo",icon:"🤵",price:1150,cat:"Sharp Suit",type:"outfit",color:"#171a23"},
+ {id:"crown",name:"Heirloom Crown",icon:"👑",price:800,cat:"Crown",type:"crown"},
+ {id:"shades",name:"Runway Black Shades",icon:"🕶️",price:450,cat:"Shades",type:"shades"},
+ {id:"diamonds",name:"Diamond Collar",icon:"💎",price:700,cat:"Jewelry",type:"jewel"},
+ {id:"pearls",name:"Layered Pearl Cascade",icon:"📿",price:600,cat:"Layered Accessory",type:"jewel"},
+ {id:"cape",name:"Royal Velvet Cape",icon:"🧥",price:750,cat:"Layered Accessory",type:"cape"},
+ {id:"halo",name:"Celestial Aura",icon:"✨",price:1000,cat:"Aura / Glow",type:"glow"},
+ {id:"rose",name:"Rose-Gold Aura",icon:"🌹",price:850,cat:"Aura / Glow",type:"glow"},
+ {id:"bag",name:"Micro Designer Bag",icon:"👜",price:500,cat:"Luxury Accessory",type:"bag"},
+ {id:"heels",name:"Crystal Heels",icon:"👠",price:550,cat:"Luxury Shoes",type:"shoes"}
+];
+const AVATARS=["🦊","🐺","🐱","🦝","🐸","🐙"];
+const LIPS=["#8d3153","#b93650","#6b1832","#e47b85","#6e3b6f","#c75b37"];
+const EYES=["#6f5c92","#4f6e9e","#8b6a45","#b36d91","#354e68","#7c3f3f"];
+const BLUSH=["#d98991","#c76878","#b65b61","#e8a6a0","#9b5f75"];
+const LINER=["#17151d","#3e253f","#2d4b5b","#6a3d27","#553b72"];
+
+let S={};
+
+const $=id=>document.getElementById(id);
+const money=n=>"$"+Math.round(n).toLocaleString();
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const shuffle=a=>[...a].sort(()=>Math.random()-.5);
+function show(id){document.querySelectorAll(".screen").forEach(x=>x.classList.toggle("active",x.id===id));window.scrollTo(0,0);updateHeader()}
+function updateHeader(){
+ $("roundPill").textContent=S.players?`Round ${Math.min(S.round+1,30)} / 30`:"Round 0 / 30";
+ const p=S.players?.[S.active]||null;$("cashPill").textContent=p?`${p.avatar} ${p.name} • ${money(p.cash)}`:"Cash: —";
+}
+function artVal(p){return p.art.reduce((n,a)=>n+a.value,0)}
+function wardrobeCount(p){return p.wardrobe.length}
+function netWorth(p){return (p.cash||0)+(p.art||[]).reduce((sum,a)=>sum+(a.value||0),0)}
+function totalSpent(p){return p.wardrobe.reduce((n,x)=>n+x.price,0)+p.makeupSpent}
+function makeInputs(){
+ const n=+$("playerCount").value,old=[...document.querySelectorAll(".pname")].map(x=>x.value);
+ $("playerInputs").innerHTML="";
+ for(let i=0;i<n;i++){const d=document.createElement("div");d.innerHTML=`<label>Player ${i+1}</label><input class="pname" maxlength="18" value="${esc(old[i]||"Player "+(i+1))}">`;$("playerInputs").appendChild(d)}
+}
+function newRoom(){
+ const names=[...document.querySelectorAll(".pname")].map(x=>x.value.trim()||"Player");
+ S={room:($("roomCode").value.trim()||"HEIST30").toUpperCase().slice(0,8),round:0,active:0,bidIndex:0,bids:[],arts:shuffle(ART),players:names.map((name,i)=>({
+  name,avatar:AVATARS[i],cash:10000,art:[],wardrobe:[],makeup:{lip:LIPS[0],eye:EYES[0],blush:BLUSH[0],liner:LINER[0],hair:"#241b24"},makeupSpent:0
+ }))};
+ $("roomDisplay").textContent=S.room;
+ $("lobbyPlayers").innerHTML=S.players.map(p=>`<div class="playercard"><div class="avatar-mini">${p.avatar}</div><b>${esc(p.name)}</b><div class="muted">Starting cash ${money(p.cash)}</div></div>`).join("");
+ show("lobby");
+}
+function startGame(){S.round=0;S.bidIndex=0;S.bids=[];renderAuction();show("auction")}
+function currentArt(){return S.arts[S.round%S.arts.length]}
+function renderAudience(){
+ $("audience").innerHTML=S.players.map((p,i)=>`<div class="seat ${i===S.bidIndex?"active":""}" style="--suit:${esc(p.wardrobe.find(x=>x.type==="outfit")?.color||"#352c50")}"><span class="paddle">BID</span><span class="seatname">${esc(p.name)}</span></div>`).join("");
+}
+function museumCard(a){
+ return `<div class="art-image" style="background:${a.color}">
+   <img src="${a.url}" alt="${esc(a.title)} by ${esc(a.artist)}" onerror="this.remove();this.parentElement.innerHTML='<div class=&quot;art-fallback&quot;>${a.icon}<br><small style=&quot;font-size:13px&quot;>Public-domain museum card</small></div>'">
+ </div>
+ <div class="art-meta"><div class="art-title">${esc(a.title)}</div><div class="artist">${esc(a.artist)} • ${esc(a.date)}</div><div class="valuation">${money(a.value)}</div><div class="muted">Auction house valuation</div></div>`;
+}
+function renderAuction(){
+ const p=S.players[S.bidIndex],a=currentArt();S.active=S.bidIndex;
+ $("turnTitle").textContent=`${p.avatar} ${p.name}'s private turn`;
+ $("roundText").textContent=`Auction round ${S.round+1} of 30`;
+ $("budgetPill").textContent=`Budget ${money(p.cash)}`;
+ $("progress").style.width=((S.round+1)/30*100)+"%";
+ $("artPanel").innerHTML=museumCard(a);
+ $("stats").innerHTML=`<div class="stat">Cash <b>${money(p.cash)}</b></div><div class="stat">Kept Art <b>${money(artVal(p))}</b></div><div class="stat">Net Worth <b>${money(netWorth(p))}</b></div><div class="stat">Wardrobe Pieces <b>${wardrobeCount(p)}</b></div>`;
+ $("bidInput").value="";$("bidMessage").innerHTML="";
+ renderAudience();updateHeader();$("bidInput").focus();
+}
+function lockBid(){
+ const p=S.players[S.bidIndex],n=Number($("bidInput").value);
+ if(!Number.isInteger(n)||n<0||n>p.cash){$("bidMessage").innerHTML='<div class="notice bad">Enter a whole-number bid from $0 up to your available cash.</div>';return}
+ S.bids.push({player:S.bidIndex,amount:n});S.bidIndex++;
+ if(S.bidIndex<S.players.length){$("bidMessage").innerHTML='<div class="notice good">Bid locked. Pass the device to the next player.</div>';setTimeout(renderAuction,550)}
+ else resolveAuction();
+}
+function resolveAuction(){
+ const counts={};S.bids.forEach(b=>counts[b.amount]=(counts[b.amount]||0)+1);
+ const unique=S.bids.filter(b=>b.amount>0&&counts[b.amount]===1);
+ const canceled=S.bids.filter(b=>b.amount>0&&counts[b.amount]>1);
+ let winner=null;
+ if(unique.length)winner=unique.reduce((x,y)=>y.amount>x.amount?y:x);
+ const a=currentArt();
+ if(winner){const p=S.players[winner.player];p.cash-=winner.amount;p.art.push(a);S.active=winner.player}
+ const zero=S.bids.filter(b=>b.amount===0);
+ if(!winner && zero.length===1){
+   winner=zero[0];
+   const p=S.players[winner.player];p.art.push(a);S.active=winner.player;
+ }
+ $("resultTitle").textContent=winner?`${S.players[winner.player].avatar} ${S.players[winner.player].name} wins ${a.title}`:"No sale — all identical bids canceled";
+ $("resultSub").textContent=winner?(winner.amount===0?"Winning bid: $0 — free acquisition after all non-zero bids canceled.":`Winning unique bid: ${money(winner.amount)}.`):"Matching bids cancel; multiple $0 bids also cancel each other.";
+
+ $("resultNotice").innerHTML=canceled.length?`<div class="notice bad"><b>Canceled matching bids:</b> ${canceled.map(b=>`${esc(S.players[b.player].name)} at ${money(b.amount)}`).join(" • ")}</div>`:'<div class="notice good">No matching non-zero bids.</div>';
+ if(zero.length)$("resultNotice").innerHTML+=`<div class="notice">Passes: ${zero.map(b=>esc(S.players[b.player].name)).join(", ")}</div>`;
+ renderRoundScores();
+ $("nextBtn").textContent=S.round===29?"Finish 30 Rounds":"Next Auction Round";
+ show("result");
+}
+function renderRoundScores(){
+ $("roundScores").innerHTML=`<div class="grid g3" style="margin-top:14px">${S.players.map(p=>`<div class="custom-card"><b>${p.avatar} ${esc(p.name)}</b><div class="muted">Cash ${money(p.cash)}</div><div class="muted">Kept art ${money(artVal(p))}</div><div class="final-score">${money(netWorth(p))}</div></div>`).join("")}</div>`;
+}
+function advance(){
+ if(S.round===29){finish();return}
+ S.round++;S.bidIndex=0;S.bids=[];renderAuction();show("auction");
+}
+function market(){
+ S.returnFrom="result";renderMarket();show("market");
+}
+function renderMarket(){
+ const p=S.players[S.active];
+ $("marketIntro").innerHTML=`<b>${p.avatar} ${esc(p.name)}</b> has ${money(p.cash)} cash and ${p.art.length} kept artwork item(s). NPC buyers make offers between rounds. <b>Selling does not consume an auction round.</b>`;
+ if(!p.art.length){$("marketList").innerHTML='<div class="notice">Your collection is empty. Return to the auction.</div>';return}
+ $("marketList").innerHTML=p.art.map((a,i)=>{
+  const floor=Math.round(a.value*.62),premium=Math.round(a.value*.88),hot=Math.round(a.value*1.04);
+  const offer=[floor,premium,hot][i%3];
+  return `<div class="market-row"><div><span class="thumb">${a.icon}</span> <b>${esc(a.title)}</b><div class="muted">${esc(a.artist)} • Kept value ${money(a.value)}</div><div class="muted">NPC offer: <span class="offer">${money(offer)}</span></div></div><button class="good" data-sell="${i}" type="button">Sell for ${money(offer)}</button></div>`;
+ }).join("");
+ document.querySelectorAll("[data-sell]").forEach(b=>b.addEventListener("click",()=>{const i=+b.dataset.sell,a=p.art[i],offer=[Math.round(a.value*.62),Math.round(a.value*.88),Math.round(a.value*1.04)][i%3];p.cash+=offer;p.art.splice(i,1);renderMarket();updateHeader()}));
+}
+function boutique(){
+ S.returnFrom="result";renderBoutique();show("shop");
+}
+function fashionPreview(f){
+ const id=f.id;
+ const art={
+  gown:`<path d="M64 105 Q100 88 136 105 L163 205 H37Z" fill="#29235d" stroke="#9a8fe0" stroke-width="4"/><path d="M65 112 Q100 132 135 112" fill="none" stroke="#d8d0ff" stroke-width="3"/>`,
+  suit:`<path d="M64 104 L100 94 L136 104 L128 205 H72Z" fill="#eee9dd" stroke="#a99572" stroke-width="3"/><path d="M100 96 V202 M72 140 H128" stroke="#9d8b6c" stroke-width="2"/><path d="M100 98 L86 128 L100 143 L114 128Z" fill="#fff"/>`,
+  redgown:`<path d="M63 105 Q100 86 137 105 L168 205 H32Z" fill="#7d1d39" stroke="#e27a7d" stroke-width="4"/><path d="M63 116 Q100 136 137 116" fill="none" stroke="#ffb1ae" stroke-width="3"/>`,
+  tux:`<path d="M62 103 L100 93 L138 103 L129 205 H71Z" fill="#171a23" stroke="#5e6474" stroke-width="4"/><path d="M100 94 L85 128 L100 144 L115 128Z" fill="#ece9e4"/><path d="M72 143 H128" stroke="#5e6474" stroke-width="2"/>`,
+  crown:`<path d="M45 126 L56 75 L78 103 L100 64 L122 103 L144 75 L155 126Z" fill="url(#g)" stroke="#806020" stroke-width="3"/><circle cx="100" cy="75" r="7" fill="#fff7c4"/><circle cx="56" cy="91" r="5" fill="#e8f3ff"/><circle cx="144" cy="91" r="5" fill="#e8f3ff"/>`,
+  shades:`<rect x="42" y="94" width="53" height="31" rx="13" fill="#171820" stroke="#c2bec9" stroke-width="3"/><rect x="105" y="94" width="53" height="31" rx="13" fill="#171820" stroke="#c2bec9" stroke-width="3"/><path d="M95 107 H105" stroke="#c2bec9" stroke-width="3"/>`,
+  diamonds:`<path d="M51 108 Q100 165 149 108" fill="none" stroke="#f0e3b2" stroke-width="7"/><circle cx="100" cy="155" r="10" fill="#eaf4ff" stroke="#fff" stroke-width="3"/>`,
+  pearls:`<path d="M60 94 Q100 153 140 94 M70 97 Q100 176 130 97 M83 99 Q100 188 117 99" fill="none" stroke="#fffaf2" stroke-width="6"/><circle cx="100" cy="185" r="8" fill="#fffaf2"/>`,
+  cape:`<path d="M42 106 Q100 82 158 106 L172 208 H28Z" fill="#382248" stroke="#b28bc9" stroke-width="4"/><path d="M53 110 Q100 130 147 110" fill="none" stroke="#e5c9f3" stroke-width="4"/>`,
+  halo:`<ellipse cx="100" cy="120" rx="73" ry="94" fill="none" stroke="#a7d8ff" stroke-width="12" opacity=".55"/><circle cx="52" cy="83" r="5" fill="#fff"/><circle cx="148" cy="125" r="4" fill="#fff"/>`,
+  rose:`<ellipse cx="100" cy="120" rx="73" ry="94" fill="none" stroke="#e9a9bc" stroke-width="12" opacity=".55"/><circle cx="52" cy="132" r="5" fill="#fff3df"/><circle cx="148" cy="88" r="4" fill="#fff3df"/>`,
+  bag:`<path d="M56 112 Q100 94 144 112 V183 Q100 202 56 183Z" fill="#d4ae64" stroke="#705221" stroke-width="3"/><path d="M64 113 Q100 57 136 113" fill="none" stroke="#d4ae64" stroke-width="8"/>`,
+  heels:`<path d="M42 154 H92 L104 182 L82 186 L44 179Z M108 154 H158 L156 179 L118 186 L96 182Z" fill="#d9c5ff" stroke="#8067a6" stroke-width="3"/>`
+ }[id]||`<circle cx="100" cy="110" r="55" fill="#ddd"/>`;
+ return `<svg viewBox="0 0 200 215" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#8b641f"/><stop offset=".5" stop-color="#fff0a3"/><stop offset="1" stop-color="#a87920"/></linearGradient></defs>${art}</svg>`;
+}
+function renderBoutique(){
+ const p=S.players[S.active];
+ $("shopCash").innerHTML=`<b>${p.avatar} ${esc(p.name)}</b> • Cash ${money(p.cash)} • Wardrobe pieces ${p.wardrobe.length}. <b>Wardrobe has zero final-score value.</b>`;
+ $("shopList").innerHTML=FASHION.map(f=>{
+  const owned=p.wardrobe.some(x=>x.id===f.id);
+  return `<div class="fashion"><div class="fashion-preview">${fashionPreview(f)}</div><div class="fashion-info"><h3>${esc(f.name)}</h3><div class="tag">${esc(f.cat)}</div><div class="price">${money(f.price)}</div><div class="${owned?"owned":""}" style="min-height:19px">${owned?"Owned • permanent this game":""}</div><button data-buy="${f.id}" ${owned||p.cash<f.price?"disabled":""} type="button">${owned?"Owned":p.cash>=f.price?"Purchase":"Insufficient cash"}</button></div></div>`;
+ }).join("");
+ document.querySelectorAll("[data-buy]").forEach(b=>b.addEventListener("click",()=>{
+   const f=FASHION.find(x=>x.id===b.dataset.buy);
+   if(!f||p.cash<f.price||p.wardrobe.some(x=>x.id===f.id))return;
+   p.cash-=f.price;p.wardrobe.push(f);renderBoutique();renderPreview();updateHeader();
+ }));
+ renderMakeup();renderPreview();
+}
+
+const MAKEUP_COST={lip:120,eye:140,blush:90,liner:110};
+function buyMakeup(key,value){
+ const p=S.players[S.active];
+ if(p.makeup[key]===value){renderBoutique();return}
+ const cost=MAKEUP_COST[key]||0;
+ if(p.cash<cost){alert(`Not enough cash. This ${key} upgrade costs ${money(cost)}.`);return}
+ p.cash-=cost;
+ p.makeup[key]=value;
+ p.makeupSpent=(p.makeupSpent||0)+cost;
+ renderBoutique();renderPreview();updateHeader();
+}
+function swatches(id,vals,key){
+ $(id).innerHTML=vals.map((v,i)=>`<button class="swatch ${S.players[S.active].makeup[key]===v?"selected":""}" type="button" style="background:${v}" data-${key}="${v}" title="${key} • ${money(MAKEUP_COST[key]||0)}"></button>`).join("");
+ document.querySelectorAll(`[data-${key}]`).forEach(b=>b.addEventListener("click",()=>buyMakeup(key,b.dataset[key])));
+}
+function renderMakeup(){
+ swatches("lipSwatches",LIPS,"lip");swatches("eyeSwatches",EYES,"eye");swatches("blushSwatches",BLUSH,"blush");swatches("linerSwatches",LINER,"liner");
+ $("hairSelect").value=S.players[S.active].makeup.hair;
+ $("hairSelect").onchange=()=>{
+   const p=S.players[S.active], value=$("hairSelect").value, cost=180;
+   if(p.makeup.hair===value)return;
+   if(p.cash<cost){alert(`Not enough cash. Hair styling costs ${money(cost)}.`);$("hairSelect").value=p.makeup.hair;return}
+   p.cash-=cost;p.makeup.hair=value;p.makeupSpent=(p.makeupSpent||0)+cost;
+   renderBoutique();renderPreview();updateHeader();
+ };
+}
+function characterHTML(p){
+ const w=p.wardrobe||[],m=p.makeup||{};
+ const outfit=w.find(x=>x.type==="outfit"),crown=w.find(x=>x.type==="crown"),jewel=w.find(x=>x.type==="jewel"),
+       glow=w.find(x=>x.type==="glow"),shades=w.find(x=>x.type==="shades"),cape=w.find(x=>x.type==="cape"),
+       bag=w.find(x=>x.type==="bag"),shoes=w.find(x=>x.type==="shoes");
+ const lips={"#8d3153":["#8d3153","#5b1834"],"#b93650":["#b93650","#74192d"],"#6b1832":["#6b1832","#3c0b1c"],"#e47b85":["#e47b85","#a83e4b"],"#6e3b6f":["#6e3b6f","#402046"],"#c75b37":["#c75b37","#81301d"]};
+ const eyes={"#6f5c92":["#c8b8df","#72578e"],"#4f6e9e":["#a9c2e4","#536f9e"],"#8b6a45":["#d3aa72","#76502e"],"#b36d91":["#e4a8bd","#914d70"],"#354e68":["#758aa6","#29394e"],"#7c3f3f":["#bb766f","#69302f"]};
+ const hairs={"#241b24":["#171319","#4a3130"],"#5b321e":["#3b2015","#8a5635"],"#d8a53c":["#a56d1d","#f0c96c"],"#d8dbe5":["#999ca8","#f4f4ef"],"#5b3f80":["#302044","#8a5fc0"]};
+ const lip=lips[m.lip]||lips["#8d3153"],eye=eyes[m.eye]||eyes["#6f5c92"],hair=hairs[m.hair]||hairs["#241b24"];
+ const blush=m.blush||"#d98991",liner=m.liner||"#17151d",outfitColor=outfit?.color||"#302b5a";
+ const uid="svg"+S.active+"_"+Date.now().toString(36);
+ return `<svg class="portraitSvg" viewBox="0 0 540 620" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${esc(p.name)} detailed SVG portrait">
+ <defs>
+  <linearGradient id="bg${uid}" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fffafc"/><stop offset=".5" stop-color="#e2d5df"/><stop offset="1" stop-color="#b5a2b4"/></linearGradient>
+  <linearGradient id="skin${uid}" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f9dcc9"/><stop offset=".55" stop-color="#e5b39a"/><stop offset="1" stop-color="#bd806d"/></linearGradient>
+  <linearGradient id="hair${uid}" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${hair[0]}"/><stop offset=".5" stop-color="${hair[1]}"/><stop offset="1" stop-color="${hair[0]}"/></linearGradient>
+  <linearGradient id="dress${uid}" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${outfitColor}"/><stop offset=".5" stop-color="#ffffff22"/><stop offset="1" stop-color="#00000055"/></linearGradient>
+  <linearGradient id="eye${uid}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="${eye[0]}"/><stop offset="1" stop-color="${eye[1]}"/></linearGradient>
+  <linearGradient id="gold${uid}" x1="0" x2="1"><stop stop-color="#81601f"/><stop offset=".5" stop-color="#fff0a4"/><stop offset="1" stop-color="#a97920"/></linearGradient>
+  <filter id="blur${uid}"><feGaussianBlur stdDeviation="8"/></filter>
+  <filter id="shadow${uid}"><feDropShadow dx="0" dy="8" stdDeviation="7" flood-opacity=".25"/></filter>
+ </defs>
+ <rect width="540" height="620" rx="30" fill="url(#bg${uid})"/>
+ <ellipse cx="270" cy="585" rx="178" ry="29" fill="#57455a" opacity=".20"/>
+ ${glow?`<ellipse cx="270" cy="285" rx="165" ry="225" fill="none" stroke="${glow.id==="rose"?"#e96b9c":"#bca4ff"}" stroke-width="20" opacity=".25" filter="url(#blur${uid})"/>`:""}
+ ${cape?`<path d="M125 590 Q151 410 270 371 Q389 410 415 590Z" fill="#392249" stroke="#b18ac8" stroke-width="5"/><path d="M148 412 Q270 451 392 412" fill="none" stroke="#ead5f3" stroke-width="4"/>`:""}
+ <path d="M143 585 Q154 420 209 374 L331 374 Q386 420 397 585Z" fill="url(#dress${uid})" stroke="#17151e" stroke-width="4" filter="url(#shadow${uid})"/>
+ <path d="M207 383 Q270 420 333 383" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="5"/>
+ ${outfit?.id==="tux"?`<path d="M270 390 L245 425 L270 452 L295 425Z" fill="#f0eee9"/><path d="M245 425 L231 478 M295 425 L309 478" stroke="#687080" stroke-width="3"/>`:""}
+ <path d="M217 344 L217 405 Q270 430 323 405 L323 344" fill="url(#skin${uid})"/>
+ <path d="M170 198 Q157 112 212 64 Q270 19 328 64 Q383 112 370 198 L351 286 Q333 350 270 369 Q207 350 189 286Z" fill="url(#skin${uid})" stroke="#805b54" stroke-width="2"/>
+ <path d="M169 198 Q155 108 210 60 Q270 13 330 60 Q385 108 371 198 Q350 139 322 118 Q278 86 230 109 Q192 129 169 198Z" fill="url(#hair${uid})" stroke="#2d2328" stroke-width="3"/>
+ <path d="M190 135 Q170 201 191 273 Q204 316 232 342 Q203 306 206 246 Q205 188 232 128Z" fill="url(#hair${uid})"/>
+ <path d="M350 135 Q370 201 349 273 Q336 316 308 342 Q337 306 334 246 Q335 188 308 128Z" fill="url(#hair${uid})"/>
+ <path d="M206 172 Q237 149 259 172 M281 172 Q303 149 334 172" fill="none" stroke="${hair[0]}" stroke-width="10" stroke-linecap="round"/>
+ <ellipse cx="221" cy="253" rx="32" ry="20" fill="${blush}" opacity="${m.blush==="none"?0:.28}" filter="url(#blur${uid})"/>
+ <ellipse cx="319" cy="253" rx="32" ry="20" fill="${blush}" opacity="${m.blush==="none"?0:.28}" filter="url(#blur${uid})"/>
+ <path d="M220 208 Q240 187 260 208 Q241 222 221 213Z" fill="url(#eye${uid})"/>
+ <path d="M280 208 Q300 187 320 208 Q299 222 280 213Z" fill="url(#eye${uid})"/>
+ ${m.liner==="winged"?`<path d="M220 211 Q241 196 260 211 Q240 204 220 214 M280 211 Q299 196 320 211 Q300 204 280 214" fill="none" stroke="${liner}" stroke-width="4" stroke-linecap="round"/><path d="M222 212 L208 204 M318 212 L332 204" stroke="${liner}" stroke-width="3.8" stroke-linecap="round"/>`:m.liner==="dramatic"?`<path d="M219 212 Q241 191 262 211 Q240 203 219 215 M278 211 Q300 191 321 212 Q300 203 279 215" fill="none" stroke="${liner}" stroke-width="6" stroke-linecap="round"/>`:`<path d="M223 211 Q241 200 259 211 M281 211 Q299 200 317 211" fill="none" stroke="${liner}" stroke-width="3.2" stroke-linecap="round"/>`}
+ <ellipse cx="241" cy="212" rx="16" ry="10" fill="#fff"/><ellipse cx="299" cy="212" rx="16" ry="10" fill="#fff"/>
+ <ellipse cx="241" cy="212" rx="6" ry="7" fill="#5b3c35"/><ellipse cx="299" cy="212" rx="6" ry="7" fill="#5b3c35"/>
+ <circle cx="242" cy="210" r="2.5" fill="#111"/><circle cx="300" cy="210" r="2.5" fill="#111"/>
+ <path d="M270 215 Q258 236 268 246 Q277 249 282 244" fill="none" stroke="#aa7367" stroke-width="3"/>
+ <path d="M249 258 Q270 247 291 258 Q281 273 270 276 Q259 273 249 258Z" fill="${lip[0]}" stroke="${lip[1]}" stroke-width="2"/>
+ <path d="M249 258 Q270 264 291 258" fill="none" stroke="#ffd6db" stroke-width="1.5" opacity=".7"/>
+ ${shades?`<g><rect x="219" y="203" width="48" height="29" rx="13" fill="#15161c" stroke="#bdb8c7" stroke-width="2.5"/><rect x="273" y="203" width="48" height="29" rx="13" fill="#15161c" stroke="#bdb8c7" stroke-width="2.5"/><path d="M267 216 H273" stroke="#bdb8c7" stroke-width="2.5"/><path d="M225 209 L260 222 M280 209 L315 222" stroke="#fff" stroke-opacity=".13" stroke-width="2"/></g>`:""}
+ ${jewel?`<g><path d="M235 326 Q270 364 305 326" fill="none" stroke="#f4e9bd" stroke-width="6"/><circle cx="270" cy="357" r="9" fill="#e8f3ff" stroke="#fff" stroke-width="2"/></g>`:""}
+ ${crown?`<g filter="url(#shadow${uid})"><path d="M216 108 L227 68 L247 96 L270 58 L293 96 L313 68 L324 108Z" fill="url(#gold${uid})" stroke="#72521c" stroke-width="3"/><circle cx="270" cy="69" r="7" fill="#edf8ff"/><circle cx="227" cy="83" r="5" fill="#edf8ff"/><circle cx="313" cy="83" r="5" fill="#edf8ff"/></g>`:""}
+ ${bag?`<g><path d="M347 452 Q375 431 403 452 V518 Q375 536 347 518Z" fill="#d8b66e" stroke="#705322" stroke-width="3"/><path d="M354 454 Q375 408 396 454" fill="none" stroke="#d8b66e" stroke-width="8"/><path d="M360 477 H390" stroke="#fff1b9" stroke-width="3"/></g>`:""}
+ ${shoes?`<path d="M213 563 H244 L255 581 L239 585 L215 580Z" fill="#d8c2ff" stroke="#7b629d" stroke-width="2"/><path d="M296 563 H327 L325 580 L301 585 L288 581Z" fill="#d8c2ff" stroke="#7b629d" stroke-width="2"/>`:""}
+ <text x="270" y="605" text-anchor="middle" font-family="Georgia,serif" font-size="15" fill="#4c4050">${esc(p.name)}</text>
+ </svg>`;
+}
+function renderPreview(){$("preview").innerHTML=`<div class="visualMirror">${characterHTML(S.players[S.active])}</div>`;}
+function stage(){
+ const p=S.players[S.active];
+ $("stageChar").innerHTML=characterHTML(p);
+ $("stageCaption").innerHTML=`<b>${p.avatar} ${esc(p.name)}</b> • ${p.wardrobe.length?"Full custom look":"Starter look"}<br><span class="muted">${p.wardrobe.map(x=>esc(x.name)).join(" • ")||"No purchased fashion yet"} • Makeup customized in studio</span>`;
+ show("stage");
+}
+function finish(){
+ const rank=[...S.players].sort((a,b)=>netWorth(b)-netWorth(a));
+ const top=rank[0],ties=rank.filter(p=>netWorth(p)===netWorth(top));
+ $("winner").textContent=ties.length>1?"Tie A Net Worth Tie!":`Winner ${top.avatar} ${top.name} wins the Heist!`;
+ $("winnerSub").textContent=ties.length>1?`Final Net Worth: ${money(netWorth(top))}`:`Highest Final Net Worth: ${money(netWorth(top))}`;
+ $("finalTable").innerHTML=`<table><thead><tr><th>Rank</th><th>Player</th><th>Remaining Cash</th><th>Unsold Kept Art</th><th>Final Net Worth</th><th>Fashion Spent</th></tr></thead><tbody>${rank.map((p,i)=>`<tr><td>${i+1}</td><td>${p.avatar} ${esc(p.name)}</td><td>${money(p.cash)}</td><td>${money(artVal(p))}</td><td class="final-score">${money(netWorth(p))}</td><td>${money(totalSpent(p))}</td></tr>`).join("")}</tbody></table>`;
+ show("final");
+}
+function reset(){S={};$("roomCode").value="HEIST30";$("playerCount").value="3";makeInputs();show("setup")}
+
+$("playerCount").addEventListener("change",makeInputs);
+$("createBtn").addEventListener("click",newRoom);$("startBtn").addEventListener("click",startGame);
+$("lockBid").addEventListener("click",lockBid);$("bidInput").addEventListener("keydown",e=>{if(e.key==="Enter")lockBid()});
+$("nextBtn").addEventListener("click",advance);$("resetBtn").addEventListener("click",reset);
+$("customizeBtn").addEventListener("click",boutique);$("resultShop").addEventListener("click",boutique);
+$("marketBtn").addEventListener("click",market);$("resultMarket").addEventListener("click",market);
+$("stageBtn").addEventListener("click",stage);$("resultStage").addEventListener("click",stage);
+$("marketBack").addEventListener("click",()=>{renderAuction();show("auction")});$("marketDone").addEventListener("click",()=>{renderAuction();show("auction")});
+$("shopBack").addEventListener("click",()=>{renderAuction();show("auction")});$("shopDone").addEventListener("click",()=>{renderAuction();show("auction")});
+$("stageBack").addEventListener("click",()=>{renderAuction();show("auction")});$("againBtn").addEventListener("click",reset);
+makeInputs();
+})();
+</script>
+</body>
+</html>
